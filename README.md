@@ -35,7 +35,7 @@ Or add manually to `package.json`:
 
 ```
 "dependencies": {
-  "@activeadmin-plugins/active_admin_theme": "1.1.4"
+  "@activeadmin-plugins/active_admin_theme": "^2.0.0"
 }
 ```
 and execute:
