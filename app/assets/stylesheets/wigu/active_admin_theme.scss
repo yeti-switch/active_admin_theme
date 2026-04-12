@@ -376,6 +376,15 @@ body.active_admin {
       padding: $skinTablePadding 12px $skinTablePadding 12px;
     }
   }
+  // active_admin_sidebar: align toggle button with sidebar section (no top margin in theme)
+  #active_admin_content.collapsible_sidebar .sidebar_toggle_btn {
+    top: 0;
+    background-color: $skinMainSecondColor;
+    &:hover {
+      background-color: lighten($skinMainSecondColor, 5%);
+    }
+  }
+
   .sidebar_section.panel {
     background-image: none;
     box-shadow: none;
