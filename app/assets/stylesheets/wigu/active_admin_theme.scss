@@ -280,6 +280,11 @@ body.active_admin {
         ul {
           background-color: $skinMenuPanelColor;
           @include rounded($skinBorderRadius);
+          // Clear the hovered top item's 7px "bridge" border (below) so the first
+          // dropdown item's highlight starts below the pill instead of being
+          // overlapped by its rounded bottom corner. Panel-colored, so the gap is
+          // invisible against the pill/panel.
+          padding-top: 6px;
           // Size to content instead of the base's max-width: calc(100% + 20px),
           // which truncates long labels onto a second line.
           width: auto;
