@@ -24,9 +24,11 @@ $skinInputBorderColor:  #c9ced4!default;  $skinInputBorderColorDark: #454b52!def
 // not set these compile to identical CSS (and a project that overrides
 // $skinMainSecondColor still gets the menu following that accent).
 $skinMenuPillColor: $skinMainSecondColor!default;   // top-level current/hover pill
+$skinMenuPillTextColor: #ffffff!default;            // top-level current/hover (selected) pill text
 $skinMenuPanelColor: $skinMainSecondColor!default;  // dropdown panel bg + hover "bridge" border
 $skinMenuItemHoverColor: transparent!default;       // dropdown item hover/current bg (was: none)
 $skinMenuTextColor: #ffffff!default;                // dropdown item text (was: inherited #fff)
+$skinMenuItemHoverTextColor: #ffffff!default;       // hover/current (selected) dropdown item text
 
 // Header / menu sizing. Defaults reproduce (or keep the same total as) the
 // previous hard-coded values, so non-configuring projects are unchanged.
@@ -271,6 +273,7 @@ body.active_admin {
     }
     ul.tabs > li.current > a, ul.tabs > li:hover > a {
       background-color: $skinMenuPillColor;
+      color: $skinMenuPillTextColor;
     }
     ul.tabs {
       li.has_nested {
@@ -299,7 +302,7 @@ body.active_admin {
           }
           li:hover > a, li.current > a {
             background-color: $skinMenuItemHoverColor;
-            color: #ffffff;
+            color: $skinMenuItemHoverTextColor;
           }
           li.current > a::before, li:hover > a::before {
             content: '';
