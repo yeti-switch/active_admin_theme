@@ -72,6 +72,7 @@ $skinButtonColorDark: $skinButtonColor!default;
 // Vertical padding controlling the height of panel/section headers and tabs.
 $skinPanelHeaderPaddingY: 8px!default;   // panel + sidebar header height
 $skinTabPaddingY: 10px!default;          // tab height
+$skinTableToolsPaddingY: 10px!default;   // table-tools (batch-actions + scope) button height
 
 // Index-table column header text (both the sortable links and plain headers use
 // one color, configurable per mode).
@@ -391,7 +392,7 @@ body.active_admin {
           background-color: var(--aa-button);
           @include rounded($skinBorderRadius);
           border: none;
-          padding: 10px 20px;
+          padding: $skinTableToolsPaddingY 20px;
           color: #ffffff;
           &:hover {
             background-color: var(--aa-button-hover);
@@ -462,7 +463,7 @@ body.active_admin {
           background-color: var(--aa-button);
           @include rounded($skinBorderRadius);
           border: none;
-          padding: 10px 20px;
+          padding: $skinTableToolsPaddingY 20px;
           color: #ffffff;
           &:hover {
             background-color: var(--aa-button-hover);
@@ -501,7 +502,7 @@ body.active_admin {
           background-color: var(--aa-button);
           @include rounded($skinBorderRadius);
           border: none;
-          padding: 10px 20px;
+          padding: $skinTableToolsPaddingY 20px;
           color: #ffffff;
           text-shadow: none;
           box-shadow: none;
@@ -515,13 +516,15 @@ body.active_admin {
         li {
           a {
             background-image: none;
-            border: none;
+            // Outline the segmented control with the border color (was a white
+            // right-divider, which is invisible when the scope bar matches the
+            // page background). Adjacent borders are collapsed below.
+            border: 1px solid var(--aa-border);
             box-shadow: none;
             background-color: var(--aa-scope);
-            padding: 10px 20px;
+            padding: $skinTableToolsPaddingY 20px;
             color: var(--aa-scope-text);
             text-shadow: none;
-            border-right: 1px solid #ffffff;
             span {
               color: var(--aa-scope-text);
               font-size: 11px;
@@ -529,6 +532,7 @@ body.active_admin {
             }
           }
         }
+        li + li a { margin-left: -1px; } // collapse the shared border between scopes
         li:first-child {
           a {
             -webkit-border-top-left-radius: $skinBorderRadius;
@@ -1172,10 +1176,6 @@ input[type='radio'] {
 // to dark mode while everything in aa-content is mode-agnostic.
 @mixin aa-dark-content {
   #wrapper #active_admin_content {
-    // Scope tab separators are white in the theme (harsh on the dark scope bar);
-    // a subtle dark groove instead.
-    div.table_tools ul.scopes li a,
-    div.table_tools .scopes li a { border-right-color: rgba(0, 0, 0, 0.22); }
     // Neutral status tags are a light grey (low contrast on dark).
     .status_tag:not(.yes):not(.no):not(.error):not(.warning):not(.ok) {
       background-color: #565c64;
