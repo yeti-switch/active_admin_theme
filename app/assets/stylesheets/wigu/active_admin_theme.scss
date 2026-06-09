@@ -278,6 +278,14 @@ body.active_admin {
       background-color: $skinMenuPillColor;
       color: $skinMenuPillTextColor;
     }
+    // The utility nav (username, clock, theme switcher, logout) are not navigation
+    // tabs: drop the pill padding, and on hover highlight by text colour only — no
+    // background block. The clock has no click action, so it gets no hover at all.
+    #utility_nav {
+      > li > a { padding: 0 5px; }
+      > li:hover > a, > li.current > a { background-color: transparent; }
+      > li#servertime:hover > a { color: #ffffff; }
+    }
     ul.tabs {
       li.has_nested {
         a {
@@ -436,8 +444,10 @@ body.active_admin {
   }
   #active_admin_content {
     span.blank_slate {
-      border: 2px solid lighten( $skinMainSecondColor, 30% );
-      color: #8494a8;
+      // Was a hardcoded lightened blue (too bright in dark mode); use the palette
+      // border + muted text so it adapts to light/dark.
+      border: 2px solid var(--aa-border);
+      color: var(--aa-text-muted);
       @include rounded($skinBorderRadius);
     }
     div.table_tools {
@@ -639,6 +649,11 @@ body.active_admin {
     }
     th.col-selectable {
       width: 12px;
+    }
+    // Center the batch-actions checkboxes (header select-all + per-row): they are
+    // baseline-aligned and otherwise ride a few px high in the cell.
+    .col-selectable input[type="checkbox"] {
+      vertical-align: middle;
     }
     th.sorted-desc {
       background-color: $skinBorderWindowColor;
