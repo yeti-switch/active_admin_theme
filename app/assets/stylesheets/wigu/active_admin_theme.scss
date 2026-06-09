@@ -54,13 +54,6 @@ $skinPanelHeaderColorDark: $skinPanelHeaderColor!default;
 $skinPanelHeaderTextColor: #ffffff!default;
 $skinPanelHeaderTextColorDark: $skinPanelHeaderTextColor!default;
 
-// Scope tabs (the All / <named scope> bar on index pages). Default to the panel
-// header color so they stay consistent; override separately if desired.
-$skinScopeColor: $skinPanelHeaderColor!default;
-$skinScopeColorDark: $skinPanelHeaderColorDark!default;
-// Scope tab text color, per mode. Defaults to white (on the colored scope bar).
-$skinScopeTextColor: #ffffff!default;
-$skinScopeTextColorDark: $skinScopeTextColor!default;
 // Form label / legend text — a muted blue-grey in light; the regular text color
 // in dark (where the muted blue-grey would be too dim).
 $skinLabelColor: #8494a8!default;
@@ -74,7 +67,17 @@ $skinButtonColorDark: $skinButtonColor!default;
 // Vertical padding controlling the height of panel/section headers and tabs.
 $skinPanelHeaderPaddingY: 8px!default;   // panel + sidebar header height
 $skinTabPaddingY: 10px!default;          // tab height
-$skinTableToolsPaddingY: 10px!default;   // table-tools (batch-actions + scope) button height
+// Height of every table-tools button (scopes, batch actions, view switcher,
+// custom tools) — matched to the panel-header height.
+$skinTableToolsHeight: 30px!default;
+// Horizontal text padding inside each table-tools button (controls button width).
+// Derived from the button height so the two scale together.
+$skinTableToolsPaddingX: $skinTableToolsHeight * 0.4 !default; // 12px at 30px
+// Per-group table-tools button fills. All default to the surface palette so the
+// whole row shares one neutral look; override any group independently (both modes).
+$skinTableToolButtonColor:       $skinSurfaceColor!default;  $skinTableToolButtonColorDark:       $skinSurfaceColorDark!default;
+$skinTableToolScopeColor:        $skinSurfaceColor!default;  $skinTableToolScopeColorDark:        $skinSurfaceColorDark!default;
+$skinTableToolBatchActionsColor: $skinSurfaceColor!default;  $skinTableToolBatchActionsColorDark: $skinSurfaceColorDark!default;
 
 // Index-table column header text (both the sortable links and plain headers use
 // one color, configurable per mode).
@@ -124,12 +127,12 @@ $skinDeleteLinkColorDark: #e06c6c!default;
   --aa-shadow:        rgba(0, 0, 0, 0.45);
   --aa-panel-header:  #{$skinPanelHeaderColorDark};
   --aa-panel-header-text: #{$skinPanelHeaderTextColorDark};
-  --aa-scope:         #{$skinScopeColorDark};
-  --aa-scope-selected: #{lighten($skinScopeColorDark, 15%)};
-  --aa-scope-text:    #{$skinScopeTextColorDark};
   --aa-label-text:    #{$skinLabelColorDark};
   --aa-button:        #{$skinButtonColorDark};
   --aa-button-hover:  #{lighten($skinButtonColorDark, 5%)};
+  --aa-table-tool-button:        #{$skinTableToolButtonColorDark};
+  --aa-table-tool-scope:         #{$skinTableToolScopeColorDark};
+  --aa-table-tool-batch-actions: #{$skinTableToolBatchActionsColorDark};
   --aa-table-header-text: #{$skinTableHeaderTextColorDark};
   --aa-tab-inactive:  #{$skinTabInactiveColorDark};
   --aa-active-tab-text:   #{$skinActiveTabTextColorDark};
@@ -152,12 +155,12 @@ $skinDeleteLinkColorDark: #e06c6c!default;
   --aa-shadow:        rgba(0, 0, 0, 0.08);
   --aa-panel-header:  #{$skinPanelHeaderColor};
   --aa-panel-header-text: #{$skinPanelHeaderTextColor};
-  --aa-scope:         #{$skinScopeColor};
-  --aa-scope-selected: #{lighten($skinScopeColor, 15%)};
-  --aa-scope-text:    #{$skinScopeTextColor};
   --aa-label-text:    #{$skinLabelColor};
   --aa-button:        #{$skinButtonColor};
   --aa-button-hover:  #{lighten($skinButtonColor, 5%)};
+  --aa-table-tool-button:        #{$skinTableToolButtonColor};
+  --aa-table-tool-scope:         #{$skinTableToolScopeColor};
+  --aa-table-tool-batch-actions: #{$skinTableToolBatchActionsColor};
   --aa-table-header-text: #{$skinTableHeaderTextColor};
   --aa-tab-inactive:  #{$skinTabInactiveColor};
   --aa-active-tab-text:   #{$skinActiveTabTextColor};
@@ -394,16 +397,18 @@ body.active_admin {
       }
       div.batch_actions_selector {
         a {
+          box-sizing: border-box;
+          height: $skinTableToolsHeight;
+          line-height: $skinTableToolsHeight;
           background-image: none;
-          border: none;
           box-shadow: none;
-          background-color: var(--aa-button);
+          background-color: var(--aa-table-tool-batch-actions);
           @include rounded($skinBorderRadius);
-          border: none;
-          padding: $skinTableToolsPaddingY 20px;
-          color: #ffffff;
+          border: 1px solid var(--aa-border);
+          padding: 0 $skinTableToolsPaddingX;
+          color: var(--aa-text);
           &:hover {
-            background-color: var(--aa-button-hover);
+            background-color: var(--aa-surface-hover);
           }
         }
       }
@@ -436,7 +441,34 @@ body.active_admin {
       @include rounded($skinBorderRadius);
     }
     div.table_tools {
-      margin-bottom: 35px;
+      margin-bottom: 14px; // match the gap between sidebar sections
+      // Contain the floated buttons so the margin sits below them. The collapsible-
+      // sidebar gem sets `.table_tools:after { clear: none; padding-bottom: 16px }`,
+      // which disables the float clearfix and otherwise leaves the box ~16px tall
+      // with the 29px buttons overflowing into the margin.
+      display: flow-root;
+      &::after { padding-bottom: 0; }
+      // Gap between the batch-actions button and the scopes — only rendered when
+      // the button is present, so scope-only pages stay flush with the table edge.
+      div.batch_actions_selector { margin-right: 10px; }
+      // Baseline for any table_tools button (the index-list view switcher, custom
+      // tools like "Visible columns", etc.). The base AA style is a light gradient;
+      // theme it via the --aa-* vars. Scopes override the fill + segmented-control
+      // geometry below (they reset border-radius and re-round only the ends).
+      a.table_tools_button {
+        box-sizing: border-box;
+        height: $skinTableToolsHeight;
+        line-height: $skinTableToolsHeight; // = button height: nudges the text to the optical centre (the font otherwise sits high in the line box)
+        background: var(--aa-table-tool-button);
+        background-image: none;
+        border: 1px solid var(--aa-border);
+        color: var(--aa-text);
+        @include rounded($skinBorderRadius);
+        padding: 0 $skinTableToolsPaddingX;
+        box-shadow: none;
+        text-shadow: none;
+        &:hover { background: var(--aa-surface-hover); }
+      }
       div.dropdown_menu {
         div.dropdown_menu_list_wrapper {
           background-color: $skinMainFirstColor;
@@ -465,16 +497,18 @@ body.active_admin {
       }
       div.batch_actions_selector {
         a {
+          box-sizing: border-box;
+          height: $skinTableToolsHeight;
+          line-height: $skinTableToolsHeight;
           background-image: none;
-          border: none;
           box-shadow: none;
-          background-color: var(--aa-button);
+          background-color: var(--aa-table-tool-batch-actions);
           @include rounded($skinBorderRadius);
-          border: none;
-          padding: $skinTableToolsPaddingY 20px;
-          color: #ffffff;
+          border: 1px solid var(--aa-border);
+          padding: 0 $skinTableToolsPaddingX;
+          color: var(--aa-text);
           &:hover {
-            background-color: var(--aa-button-hover);
+            background-color: var(--aa-surface-hover);
           }
         }
       }
@@ -506,16 +540,19 @@ body.active_admin {
       }
       div.batch_actions_selector {
         a {
+          box-sizing: border-box;
+          height: $skinTableToolsHeight;
+          line-height: $skinTableToolsHeight;
           background-image: none;
-          background-color: var(--aa-button);
+          background-color: var(--aa-table-tool-batch-actions);
           @include rounded($skinBorderRadius);
-          border: none;
-          padding: $skinTableToolsPaddingY 20px;
-          color: #ffffff;
+          border: 1px solid var(--aa-border);
+          padding: 0 $skinTableToolsPaddingX;
+          color: var(--aa-text);
           text-shadow: none;
           box-shadow: none;
           &:hover {
-            background-color: var(--aa-button-hover);
+            background-color: var(--aa-surface-hover);
             box-shadow: none;
           }
         }
@@ -524,17 +561,20 @@ body.active_admin {
         li {
           a {
             background-image: none;
+            // Reset the generic .table_tools_button radius — scopes are a segmented
+            // control, so only the first/last child are re-rounded (below).
+            @include rounded(0);
             // Outline the segmented control with the border color (was a white
             // right-divider, which is invisible when the scope bar matches the
             // page background). Adjacent borders are collapsed below.
             border: 1px solid var(--aa-border);
             box-shadow: none;
-            background-color: var(--aa-scope);
-            padding: $skinTableToolsPaddingY 20px;
-            color: var(--aa-scope-text);
+            background-color: var(--aa-table-tool-scope);
+            padding: 0 $skinTableToolsPaddingX;
+            color: var(--aa-text);
             text-shadow: none;
             span {
-              color: var(--aa-scope-text);
+              color: var(--aa-text);
               font-size: 11px;
               font-weight: bold;
             }
@@ -543,6 +583,11 @@ body.active_admin {
         li + li a { margin-left: -1px; } // collapse the shared border between scopes
         li:first-child {
           a {
+            // Override AA's base `.scopes li:first-child a { margin-left: 10px }`.
+            // That gap belongs on the batch-actions button (margin-right below), so
+            // the scope bar aligns with the table's left edge when there are no
+            // batch actions.
+            margin-left: 0;
             -webkit-border-top-left-radius: $skinBorderRadius;
             -webkit-border-bottom-left-radius: $skinBorderRadius;
             -moz-border-radius-topleft: $skinBorderRadius;
@@ -563,7 +608,9 @@ body.active_admin {
         }
         li.selected {
           a {
-            background-color: var(--aa-scope-selected);
+            // Selected scope: a touch lighter than the neutral fill. Shares the
+            // hover shade; swap to a dedicated var if you want it more distinct.
+            background-color: var(--aa-surface-hover);
           }
         }
       }
@@ -1073,7 +1120,7 @@ input[type='radio'] {
     // (.table_tools_button), jQuery-UI tab anchors (.ui-tabs-anchor) — and delete
     // links (handled by their own rule). Excluding them means those rules win on
     // their own, with no need for !important.
-    a:not(.button):not(.action_item):not(.table_tools_button):not(.ui-tabs-anchor):not([data-method="delete"]) { color: var(--aa-link); }
+    a:not(.button):not(.action_item):not(.table_tools_button):not(.dropdown_menu_button):not(.ui-tabs-anchor):not([data-method="delete"]) { color: var(--aa-link); }
     a[data-method="delete"], a.delete_link { color: var(--aa-delete-link); }
 
     // Pagination — non-current page chips use a light-grey bg in the theme
