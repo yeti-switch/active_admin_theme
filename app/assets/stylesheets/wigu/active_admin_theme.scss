@@ -452,6 +452,9 @@ body.active_admin {
     }
     div.table_tools {
       margin-bottom: 14px; // match the gap between sidebar sections
+      // The gem shrinks the scope / batch / tool buttons to 0.9em; reset to 1em so
+      // they match the surrounding base text — the same size the panel headers use.
+      .scopes a, a.table_tools_button, .dropdown_menu_button { font-size: 1em; }
       // Contain the floated buttons so the margin sits below them. The collapsible-
       // sidebar gem sets `.table_tools:after { clear: none; padding-bottom: 16px }`,
       // which disables the float clearfix and otherwise leaves the box ~16px tall
@@ -1220,6 +1223,24 @@ input[type='radio'] {
     table.index_table tfoot th {
       background: var(--aa-surface-2);
       color: var(--aa-text);
+    }
+
+    // Index footer (per-page selector, pagination, "displaying…" info, download
+    // links): lay them out in one left-packed, vertically-centred row. The gem
+    // floats them, so they sat top-aligned and, having different heights, looked
+    // misaligned. A slightly larger font than the gem default (0.85em) too.
+    #index_footer {
+      text-align: left;
+      font-size: 0.95em;
+      .pagination_per_page,
+      .pagination,
+      .pagination_information,
+      .download_links {
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 8px 0 0;
+      }
     }
 
     // Forms & inputs
