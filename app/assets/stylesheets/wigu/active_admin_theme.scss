@@ -379,24 +379,23 @@ body.active_admin {
       }
       div.dropdown_menu {
         div.dropdown_menu_list_wrapper {
-          background-color: $skinMainFirstColor;
-          border: none;
+          background-color: var(--aa-surface);
+          border: 1px solid var(--aa-border);
           background-image: none;
-          border: none;
           box-shadow: none;
           div.dropdown_menu_nipple, div.dropdown_menu_nipple:after, div.dropdown_menu_nipple:before {
-            border-color: $skinMainFirstColor transparent;
+            border-color: var(--aa-surface) transparent;
           }
           ul.dropdown_menu_list {
             box-shadow: none;
             li {
               a {
-                background-color: #ffffff;
-                color: $skinMainFirstColor;
+                background-color: var(--aa-surface);
+                color: var(--aa-text);
                 border-radius: 0;
                 &:hover {
-                  background-color: $skinMainSecondColor;
-                  color: #ffffff;
+                  background-color: var(--aa-surface-hover);
+                  color: var(--aa-text);
                 }
               }
             }
@@ -484,24 +483,23 @@ body.active_admin {
       }
       div.dropdown_menu {
         div.dropdown_menu_list_wrapper {
-          background-color: $skinMainFirstColor;
-          border: none;
+          background-color: var(--aa-surface);
+          border: 1px solid var(--aa-border);
           background-image: none;
-          border: none;
           box-shadow: none;
           div.dropdown_menu_nipple, div.dropdown_menu_nipple:after, div.dropdown_menu_nipple:before {
-            border-color: $skinMainFirstColor transparent;
+            border-color: var(--aa-surface) transparent;
           }
           ul.dropdown_menu_list {
             box-shadow: none;
             li {
               a {
-                background-color: #ffffff;
-                color: $skinMainFirstColor;
+                background-color: var(--aa-surface);
+                color: var(--aa-text);
                 border-radius: 0;
                 &:hover {
-                  background-color: $skinMainSecondColor;
-                  color: #ffffff;
+                  background-color: var(--aa-surface-hover);
+                  color: var(--aa-text);
                 }
               }
             }
@@ -527,24 +525,24 @@ body.active_admin {
       }
       div.dropdown_menu {
         div.dropdown_menu_list_wrapper {
-          background-color: $skinMainFirstColor;
-          border: none;
+          background-color: var(--aa-surface);
+          border: 1px solid var(--aa-border);
           background-image: none;
           div.dropdown_menu_nipple, div.dropdown_menu_nipple:after, div.dropdown_menu_nipple:before {
-            border-color: $skinMainFirstColor transparent;
+            border-color: var(--aa-surface) transparent;
           }
           ul.dropdown_menu_list {
             box-shadow: none;
             li {
               a {
-                background-color: #ffffff;
+                background-color: var(--aa-surface);
                 box-shadow: none;
-                color: $skinMainFirstColor;
+                color: var(--aa-text);
                 border-radius: 0;
                 text-shadow: none;
                 &:hover {
-                  background-color: $skinMainSecondColor;
-                  color: #ffffff;
+                  background-color: var(--aa-surface-hover);
+                  color: var(--aa-text);
                 }
               }
             }
@@ -621,9 +619,11 @@ body.active_admin {
         }
         li.selected {
           a {
-            // Selected scope: a touch lighter than the neutral fill. Shares the
-            // hover shade; swap to a dedicated var if you want it more distinct.
+            // Selected scope: a touch lighter than the neutral fill, plus an accent
+            // text colour so the active scope's label stands out.
             background-color: var(--aa-surface-hover);
+            color: var(--aa-link);
+            span { color: var(--aa-link); }
           }
         }
       }
@@ -1007,23 +1007,29 @@ form fieldset > ol > li fieldset ol li {
     margin-top: 6px
   }
 }
+// Dropdown (batch-actions / title-bar / table-tools) menu items: keep them on the
+// surface text colour, not the global link blue that otherwise leaks in.
+.dropdown_menu_list li a { color: var(--aa-text) !important; }
+
 .ui-dialog {
   background-image: none;
   box-shadow: none;
   text-shadow: none;
-  box-shadow: none;
-  background-color: #ffffff;
-  border-bottom: 2px solid $skinBorderWindowColor;
+  background-color: var(--aa-surface);
+  color: var(--aa-text);
+  border-bottom: 1px solid var(--aa-border);
   .ui-dialog-titlebar {
     background-image: none;
     box-shadow: none;
     text-shadow: none;
     box-shadow: none;
-    background-color: $skinMainSecondColor;
-    color: #ffffff;
+    background-color: var(--aa-panel-header);
+    color: var(--aa-panel-header-text);
     border: none;
-    padding: 8px 15px;
-    font-weight: 400;
+    border-bottom: 1px solid var(--aa-border);
+    padding: $skinPanelHeaderPaddingY 15px;
+    font-weight: 700;
+    font-size: 1em;
 
     -webkit-border-top-left-radius: $skinBorderRadius;
     -webkit-border-top-right-radius: $skinBorderRadius;
@@ -1031,6 +1037,15 @@ form fieldset > ol > li fieldset ol li {
     -moz-border-radius-topright: $skinBorderRadius;
     border-top-left-radius: $skinBorderRadius;
     border-top-right-radius: $skinBorderRadius;
+  }
+  // jQuery-UI close button: drop the default grey gradient pill so it blends into
+  // the accent titlebar.
+  .ui-dialog-titlebar-close {
+    background: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    color: var(--aa-panel-header-text);
   }
   form {
     ul {
@@ -1076,14 +1091,14 @@ form fieldset > ol > li fieldset ol li {
         background-image: none;
         box-shadow: none;
         text-shadow: none;
-        box-shadow: none;
-        background-color: #ffffff;
+        background-color: var(--aa-surface);
+        color: var(--aa-text);
         @include rounded($skinBorderRadius);
         padding: 9px 20px 9px 20px;
-        border-color: #E4E4E4;
+        border: 1px solid var(--aa-border);
         &:hover {
           background-image: none!important;
-          background-color: #F4F4F4!important;
+          background-color: var(--aa-surface-hover)!important;
         }
       }
     }
