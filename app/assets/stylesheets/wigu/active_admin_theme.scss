@@ -67,6 +67,7 @@ $skinButtonColorDark: $skinButtonColor!default;
 // Vertical padding controlling the height of panel/section headers and tabs.
 $skinPanelHeaderPaddingY: 8px!default;   // panel + sidebar header height
 $skinTabPaddingY: 10px!default;          // tab height
+$skinTabPaddingX: 20px!default;          // tab label horizontal padding (text → border)
 // Height of every table-tools button (scopes, batch actions, view switcher,
 // custom tools) — matched to the panel-header height.
 $skinTableToolsHeight: 30px!default;
@@ -209,7 +210,7 @@ body.active_admin {
       background-color: var(--aa-tab-inactive);
       color: var(--aa-inactive-tab-text);
       margin-right: 5px;
-      padding: $skinTabPaddingY 20px;
+      padding: $skinTabPaddingY $skinTabPaddingX;
 
       -webkit-border-top-left-radius: $skinBorderRadius;
       -webkit-border-top-right-radius: $skinBorderRadius;
