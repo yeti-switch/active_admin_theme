@@ -634,6 +634,10 @@ body.active_admin {
     background-color: var(--aa-surface);
     // Uniform 1px border (no thicker bottom) so the rounded corners are even.
     border: 1px solid var(--aa-border);
+    // The right edge is owned by the last-column cells (below) rather than the
+    // table itself, so a last-column cell's own border-right doesn't stack
+    // against the table border 1px further out (a doubled right line).
+    border-right: 0;
     @include rounded($skinBorderRadius);
     th {
       background-image: none;
@@ -644,13 +648,38 @@ body.active_admin {
       font-weight: bold;
       background-color: $skinBorderWindowColor;
       padding: $skinTablePadding 12px $skinTablePadding 12px;
-      border-bottom: 3px solid darken( $skinBorderWindowColor, 5% );
+      // 1px header underline (was 3px) so it matches the other 1px borders.
+      border-bottom: 1px solid darken( $skinBorderWindowColor, 5% );
       border-right: 1px solid darken( $skinBorderWindowColor, 5% );
       a {
         font-size: 1.0em;
         font-weight: bold!important;
       }
     }
+    // Right edge = a single 1px line on the last-column cells (header th, body
+    // td, footer cells) coloured like the table border, since the table itself
+    // no longer draws a right border.
+    thead th:last-child,
+    tbody td:last-child,
+    tfoot tr > :last-child {
+      border-right: 1px solid var(--aa-border);
+    }
+    // Drop the bottom row's cell border: with border-collapse: separate it sits
+    // just inside the table's own bottom border, so the two stack and the bottom
+    // edge looks thicker than the other sides. The bottom row is the footer's
+    // last row when there's a totals footer, otherwise the body's last row.
+    tfoot tr:last-child > td,
+    tfoot tr:last-child > th { border-bottom: 0; }
+    &:not(:has(tfoot)) tbody tr:last-child > td { border-bottom: 0; }
+    // Round the corner cells so their square backgrounds follow the table's
+    // rounded border instead of cutting square notches into it (separate borders
+    // don't round cell backgrounds). Nest 1px inside the table's outer radius.
+    thead th:first-child { border-top-left-radius: $skinBorderRadius - 1px; }
+    thead th:last-child  { border-top-right-radius: $skinBorderRadius - 1px; }
+    tfoot tr:last-child > :first-child { border-bottom-left-radius: $skinBorderRadius - 1px; }
+    tfoot tr:last-child > :last-child  { border-bottom-right-radius: $skinBorderRadius - 1px; }
+    &:not(:has(tfoot)) tbody tr:last-child > td:first-child { border-bottom-left-radius: $skinBorderRadius - 1px; }
+    &:not(:has(tfoot)) tbody tr:last-child > td:last-child  { border-bottom-right-radius: $skinBorderRadius - 1px; }
     th.col-selectable {
       width: 12px;
     }
@@ -1134,7 +1163,12 @@ input[type='radio'] {
   }
 }
 
-.attributes_table table td .status_tag.empty {
+// Status tag: solid colour fill with a white label (high visibility), and an
+// outline a shade darker than the fill so the edge reads in the tag's own
+// colour. All colours are fixed, so a tag looks identical in light and dark.
+@mixin status-tag-colors($c) {
+  background: $c;
+  border-color: mix($c, #000000, 84%); // = darken($c) — outline in the fill colour
   color: #ffffff;
 }
 
@@ -1148,6 +1182,34 @@ input[type='radio'] {
 
   #wrapper #active_admin_content {
     color: var(--aa-text);
+
+    // Status tags: solid colour fill + white label (high visibility), an
+    // in-colour outline, rounded corners and a centered label. Colours are
+    // mode-independent (same in light and dark). The base ActiveAdmin rule
+    // supplies uppercase + letter-spacing + font-size; text-indent offsets the
+    // trailing letter-spacing so the label is horizontally centered.
+    .status_tag {
+      display: inline-block;
+      line-height: 1;
+      padding: 3px 5px;
+      text-indent: 0.15em;
+      border-radius: 2px;
+      border: 1px solid;
+
+      @include status-tag-colors(#8a909a); // neutral default (e.g. "No", protocol tags)
+      &.ok, &.published, &.complete, &.completed, &.green, &.yes { @include status-tag-colors(#8daa92); }
+      &.notice, &.blue { @include status-tag-colors(#6090db); }
+      &.warn, &.warning, &.orange { @include status-tag-colors(#e29b20); }
+      &.error, &.errored, &.red { @include status-tag-colors(#d45f53); }
+      &.empty, &.unknown, &.none {
+        background: none;
+        border: 0; // placeholder/empty tags stay unobtrusive (no outline)
+        color: var(--aa-text-muted);
+        font-weight: bold;
+        font-size: 0.8em;
+        text-indent: 0;
+      }
+    }
 
     // Generic content links take the link color. Exclude UI "chrome" links that
     // carry their own color — buttons, title-bar actions, scope/batch buttons
@@ -1173,12 +1235,16 @@ input[type='radio'] {
     .panel,
     .sidebar_section,
     .dashboard_section,
-    .index_content,
     fieldset.inputs {
       background: var(--aa-surface);
       border-color: var(--aa-border);
       color: var(--aa-text);
     }
+    // .index_content wraps the index table, which already paints its own
+    // (rounded) surface. Giving this square-cornered wrapper a surface bg makes
+    // it show through the table's rounded corners as white squares, so leave it
+    // transparent (same reasoning as .panel_contents above).
+    .index_content { color: var(--aa-text); }
     // Blank-slate ("No records") container blends into the page background
     // rather than reading as a panel surface.
     .blank_slate_container {
@@ -1289,13 +1355,9 @@ input[type='radio'] {
 // equivalent (or that would be wrong on a light surface), so these stay scoped
 // to dark mode while everything in aa-content is mode-agnostic.
 @mixin aa-dark-content {
-  #wrapper #active_admin_content {
-    // Neutral status tags are a light grey (low contrast on dark).
-    .status_tag:not(.yes):not(.no):not(.error):not(.warning):not(.ok) {
-      background-color: #565c64;
-      color: #fff;
-    }
-  }
+  // (Currently empty — status tags now use mode-independent soft colours in
+  // aa-content, so no dark-only override is needed. Kept for future dark-only
+  // content rules.)
 }
 
 // Content styling applies in BOTH modes (aa-dark-palette supplies the per-mode
