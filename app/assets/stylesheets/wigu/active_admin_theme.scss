@@ -1191,7 +1191,12 @@ input[type='radio'] {
     .status_tag {
       display: inline-block;
       line-height: 1;
-      padding: 3px 5px;
+      // 4px (not 5px) horizontal padding so the added 1px border doesn't widen
+      // the tag past ActiveAdmin's original borderless 5px-padded width. 1px less
+      // bottom padding than top (like the stock AA tag) optically centers the
+      // uppercase label, which otherwise rides high (no descenders to fill the
+      // reserved space below the baseline).
+      padding: 3px 4px 2px;
       text-indent: 0.15em;
       border-radius: 2px;
       border: 1px solid;
