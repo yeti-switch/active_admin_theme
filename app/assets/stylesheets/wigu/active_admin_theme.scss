@@ -931,6 +931,21 @@ form fieldset.inputs > ol { clear: both; }
 .comments form.active_admin_comment fieldset.inputs {
   border: none
 }
+// Comment meta column (author / date / "Delete Comment"). AA's base _comments.scss
+// caps it at 130px — too narrow for the timestamp (~99px) and the "Delete Comment"
+// link (~77px) to share a line, so the link wraps to its own row. Widen the column
+// so date + link sit together; keep the body/form offset (base = meta width + 20px)
+// in step.
+.comments .active_admin_comment {
+  .active_admin_comment_meta { width: 200px; }
+  .active_admin_comment_body { margin-left: 220px; }
+}
+.comments form.active_admin_comment { margin-left: 220px; }
+// AA base hardcodes `.comments .pagination_information { color: #000 }` (the
+// "Displaying 1 comment" line) — black-on-dark in dark mode. Re-point to the
+// themed text color so it reads in both modes.
+.comments .pagination_information,
+.comments .pagination_information b { color: var(--aa-text); }
 .pagination {
   span > a {
     background-image: none;
